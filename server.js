@@ -12,21 +12,21 @@ app.use(express.static(__dirname));  // Serve static files from the current dire
 app.post('/execute', (req, res) => {
     const code = req.body.code;
 
-    // Сохраняем код во временный файл
+    // Save the code in a temporary file
     const filename = `temp_${Date.now()}.js`;
     fs.writeFileSync(filename, code);
 
-    // Ограничения для Docker контейнера:
-    const cpuLimit = "0.5";      // Ограничение в 0.5 CPU
-    const memoryLimit = "100m";  // Ограничение в 100 мегабайт
-    const timeout = 10000;        // Таймаут в 10 секунд
+    // Docker container limits:
+    const cpuLimit = "0.5";      // Limit to 0.5 CPU
+    const memoryLimit = "100m";  // Limit to 100 megabytes
+    const timeout = 10000;      // Timeout in 10 seconds
 
-    // Запускаем Docker с выполнением кода
+    // Run Docker to execute the code
     exec(`docker run --rm --cpus=${cpuLimit} --memory=${memoryLimit} -v ${__dirname}:/app node:18 node /app/${filename}`,
          { timeout: timeout },
          (error, stdout, stderr) => {
 
-        // Удаляем временный файл после выполнения
+        // Remove the temporary file after execution
         fs.unlinkSync(filename);
 
         if (error) {
@@ -42,14 +42,14 @@ app.post('/execute', (req, res) => {
 });
 
 console.log('Pulling node:18 image...');
-// Загрузка Docker образа node:18
+// Download Docker image node:18
 exec('docker pull node:18', (error, stdout, stderr) => {
     if (error) {
         console.error('Error pulling node:18 image:', error);
     } else {
         console.log('Node:18 image pulled successfully');
 
-        // Старт сервера после успешной загрузки образа
+        // Start the server after the image is successfully pulled
         app.listen(port, () => {
             console.log(`Server started on http://localhost:${port}`);
         });

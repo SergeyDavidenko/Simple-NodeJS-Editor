@@ -2,6 +2,7 @@
 
 An online NodeJS editor with code execution inside a Docker container.
 
+![interface](/img/screen.jpg?raw=true "Main interface")
 
 ## Installation and Setup
 
